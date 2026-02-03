@@ -12,7 +12,22 @@
 	},
 	"ai": {
 		"binding": "AI"
-	}
+	},
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "CHAT_HISTORY_STORE",
+				"class_name": "ChatSession"
+			}
+		]
+	},
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_classes": ["ChatSession"]
+		}
+	]
+	
 	// "workflows": [
 	// 	{
 	// 		"name": "workflow-cf-ai-brainspinoff",

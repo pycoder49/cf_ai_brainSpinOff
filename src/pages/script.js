@@ -10,6 +10,21 @@
 /* ============================================== */
 const API_BASE_URL = "https://cf-ai-brainspinoff.arahuja.workers.dev";
 
+/* ============================================== */
+/* MY HELPERS MADE BY ARYAN */
+/* ============================================== */
+function getChatId(){
+    const key = "chat_id";
+    let id = localStorage.getItem(key);
+
+    if(!id){
+        id = crypto.randomUUID();
+        localStorage.setItem(key, id);
+    }
+
+    return id;
+}
+
 // Relevant chats data - these would come from your RAG system
 // based on similarity to the current conversation
 const relevantChats = [
@@ -471,7 +486,10 @@ async function callCloudflareAPI(userMessage){
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ message: userMessage })
+            body: JSON.stringify({ 
+                message: userMessage,
+                chatId: getChatId()
+            })
         });
 
         const data = await response.json();
