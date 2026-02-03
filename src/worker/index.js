@@ -57,7 +57,10 @@ export default{
 			}
 
 			// calling the worker AI binding to get a response from llama
-			const aiResponse = await env.AI.run("@cf/meta/llama-3.3-70b-instruct", {
+			if (!env.AI) {
+				return Response.json({ error: "AI binding missing (env.AI is undefined)" }, { status: 500, headers: corsHeaders() });
+			}
+			const aiResponse = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
 				messages: [
 					{ 
 						role: "system",
