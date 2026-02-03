@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Chatbot</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- ================================================== -->
+        <!-- LEFT SIDEBAR - Chats                               -->
+        <!-- ================================================== -->
+        <aside class="sidebar sidebar-left">
+            
+            <!-- Relevant Chats Section -->
+            <section class="sidebar-section relevant-chats-section">
+                <header class="section-header">
+                    <span class="section-indicator indicator-blue"></span>
+                    <h2 class="section-title">Relevant Chats</h2>
+                </header>
+                
+                <div class="section-content" id="relevant-chats-list">
+                    <!-- Relevant chats will be populated by JavaScript -->
+                </div>
+            </section>
+            
+            <!-- Recent Chats Section -->
+            <section class="sidebar-section recent-chats-section">
+                <header class="section-header">
+                    <span class="section-indicator indicator-gray"></span>
+                    <h2 class="section-title">Recent Chats</h2>
+                    <button class="btn-new-chat" id="btn-new-chat">+ New</button>
+                </header>
+                
+                <div class="section-content" id="recent-chats-list">
+                    <!-- Recent chats will be populated by JavaScript -->
+                </div>
+            </section>
+        </aside>
+
+        <!-- ================================================== -->
+        <!-- MAIN CHAT AREA                                     -->
+        <!-- ================================================== -->
+        <main class="chat-main">
+            
+            <!-- Ambient Background Glow -->
+            <div class="ambient-glow"></div>
+            
+            <!-- Chat Header -->
+            <header class="chat-header">
+                <div class="chat-header-left">
+                    <div class="assistant-avatar">✦</div>
+                    <div class="assistant-info">
+                        <h1 class="assistant-name">RAG Assistant</h1>
+                        <p class="assistant-status">
+                            <span class="status-dot"></span>
+                            Connected to <span id="document-count">24</span> documents
+                        </p>
+                    </div>
+                </div>
+                <div class="chat-header-right">
+                    <button class="btn-settings">⚙️ Settings</button>
+                </div>
+            </header>
+            
+            <!-- Messages Container -->
+            <div class="messages-container" id="messages-container">
+                <!-- Messages will be populated by JavaScript -->
+            </div>
+            
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="message-input"
+                        placeholder="Ask anything about your documents..."
+                        rows="1"
+                    ></textarea>
+                    <button class="btn-send" id="btn-send" disabled>
+                        Send
+                        <span class="send-arrow">↑</span>
+                    </button>
+                </div>
+                <p class="input-hint">Press Enter to send · Shift+Enter for new line</p>
+            </div>
+        </main>
+
+        <!-- ================================================== -->
+        <!-- RIGHT SIDEBAR - Files                              -->
+        <!-- ================================================== -->
+        <aside class="sidebar sidebar-right">
+            
+            <!-- File Directory Section -->
+            <section class="sidebar-section files-section">
+                <header class="section-header">
+                    <span class="section-indicator indicator-orange"></span>
+                    <h2 class="section-title">Files</h2>
+                </header>
+                
+                <!-- Search Bar -->
+                <div class="search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input 
+                        type="text" 
+                        id="file-search" 
+                        placeholder="Search files..."
+                    >
+                    <button class="search-clear" id="search-clear" hidden>✕</button>
+                </div>
+                
+                <!-- File Tree -->
+                <div class="section-content file-tree" id="file-tree">
+                    <!-- File tree will be populated by JavaScript -->
+                </div>
+            </section>
+            
+            <!-- Recent Files Section -->
+            <section class="sidebar-section recent-files-section">
+                <header class="section-header">
+                    <span class="section-indicator indicator-green"></span>
+                    <h2 class="section-title">Recent Files</h2>
+                </header>
+                
+                <div class="section-content" id="recent-files-list">
+                    <!-- Recent files will be populated by JavaScript -->
+                </div>
+            </section>
+            
+            <!-- Upload Section -->
+            <section class="sidebar-section upload-section">
+                <header class="section-header">
+                    <span class="section-indicator indicator-purple"></span>
+                    <h2 class="section-title">Upload</h2>
+                </header>
+                
+                <div 
+                    class="drop-zone" 
+                    id="drop-zone"
+                >
+                    <div class="drop-zone-icon">☁️</div>
+                    <div class="drop-zone-text">Drag & drop files</div>
+                    <div class="drop-zone-hint">
+                        or <span class="browse-link" id="browse-link">browse</span>
+                    </div>
+                </div>
+                
+                <!-- Hidden file input for browse functionality -->
+                <input 
+                    type="file" 
+                    id="file-input" 
+                    multiple 
+                    hidden
+                >
+            </section>
+        </aside>
+        
+    </div>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
