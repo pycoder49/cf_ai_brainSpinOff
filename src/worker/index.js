@@ -1,85 +1,101 @@
 function corsHeaders() {
 	return {
-		"Access-Control-Allow-Origin": "*",
+		"Access-Control-Allow-Origin": origin ?? "*",
 		"Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 		"Access-Control-Allow-Headers": "Content-Type",
 	}
 }
 
+function withCors(response, origin) {
+	const newHeaders = new Headers(response.headers);
+	const cors = corsHeaders(origin);
+	for(const [key, value] of Object.entries(cors)){
+		newHeaders.set(key, value);
+	}
+	return new Response(response.body, {
+		status: response.status,
+		headers: newHeaders
+	})
+}
+
 export default{
 	async fetch(request, env){
-		const url = new URL(request.url);
+		const origin = request.headers.get("Origin");
 
 		// Handle CORS preflight request
 		if(request.method === "OPTIONS"){
-			return new Response(null, {headers: corsHeaders()});
+			return new Response(null, {status: 204, headers: corsHeaders(origin)});
 		}
 
-		// health check endpoint
-		if(url.pathname === "/health"){
-			return new Response("OK", {status: 200, headers: corsHeaders()});
-		}
+		try{
+			const url = new URL(request.url);
 
-		// echo endpoint
-		if(url.pathname === "/echo" && request.method === "POST"){
-			const body = await request.json();
-			return Response.json(
-				{
-					you_sent: body,
-					timestamp: Date.now()
-				},
-				{
-					headers: corsHeaders()
+			// health check endpoint
+			if(url.pathname === "/health"){
+				return new Response("OK", {status: 200, headers: corsHeaders(origin)});
+			}
+
+			// chat endpoint
+			if(url.pathname === "/chat" && request.method === "POST"){
+				let body
+
+				try{
+					body = await request.json();
 				}
-			);
-		}
+				catch(e){
+					return new Response(JSON.stringify({ error: "Invalid JSON" }), {
+						status: 400,
+						headers: {
+							...corsHeaders(origin),
+							"Content-Type": "application/json"
+						}
+					})
+				}
 
-		// chat endpoint
-		if(url.pathname === "/chat" && request.method === "POST"){
-			let body
+				const userMessage = body.message;
+				if(!userMessage){
+					return new Response(JSON.stringify({ error: "Missing 'message' in request body" }), {
+						status: 400,
+						headers: {
+							...corsHeaders(origin),
+							"Content-Type": "application/json"
+						}
+					})
+				}
 
-			try{
-				body = await request.json();
-			}
-			catch(e){
-				return Response.json(
-					{ error: "Invalid JSON" },
-					{ status: 400, headers: corsHeaders() }
-				);
-			}
+				// calling the worker AI binding to get a response from llama
+				const aiResponse = await env.AI.run("@cf/meta/llama-3.3-70b-instruct", {
+					messages: [
+						{ role: "system", content: "You are a helpful assistant." },
+						{ role: "user", content: userMessage },
+					],
+				});
 
-			const userMessage = body.message;
-			if(!userMessage){
-				return Response.json(
-					{ error: "Missing 'message' field in request body" },
-					{ status: 400, headers: corsHeaders() }
-				);
-			}
-
-			// calling the worker AI binding to get a response from llama
-			if (!env.AI) {
-				return Response.json({ error: "AI binding missing (env.AI is undefined)" }, { status: 500, headers: corsHeaders() });
-			}
-			const aiResponse = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
-				messages: [
-					{ 
-						role: "system",
-						content: "You are a helpful assistant"
-					},
-					{
-						role: "user",
-						content: userMessage
+				// output inside aiResponse.response
+				return new Response(
+					JSON.stringify({
+						response: aiResponse.response,
+						timestamp: Date.now()
+					}), {
+					status: 200,
+					headers: {
+						...corsHeaders(origin),
+						"Content-Type": "application/json"
 					}
-				]
-			});
+				})
+			}
 
-			// output inside aiResponse.response
-			return Response.json(
-				{ response: aiResponse.response, timestamp: Date.now() },
-				{ headers: corsHeaders() }
-			);
+			// If no matching route found
+			return new Response("Not Found", {status: 404, headers: corsHeaders()});
 		}
-
-		return new Response("Not Found", {status: 404, headers: corsHeaders()});
+		catch(e){
+			return new Response(JSON.stringify({errpr: e.message ?? "Server error"}), {
+				status: 500,
+				headers: {
+					...corsHeaders(origin),
+					"Content-Type": "application/json"
+				}
+			});
+		}
 	}
 };
