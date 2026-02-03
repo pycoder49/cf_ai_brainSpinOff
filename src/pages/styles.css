@@ -61,6 +61,11 @@
     box-sizing: border-box;
 }
 
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
 body {
     font-family: var(--font-primary);
     background: linear-gradient(145deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
@@ -133,13 +138,20 @@ textarea {
 
 .app-container {
     display: flex;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
 }
 
 
 /* ============================================== */
 /* SIDEBAR - Shared Styles                       */
 /* ============================================== */
+
+.sidebar,
+.chat-main,
+.sidebar-section {
+  min-height: 0;
+}
 
 .sidebar {
     width: var(--sidebar-width);
